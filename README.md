@@ -28,24 +28,49 @@ Ensure you have the following applications installed and properly configured:
 
 ### 2. Configure Shizuku (rish)
 
-The script depends on the `rish` command to communicate with Shizuku. You need to place the `rish` executable in the path expected by the script.
+This script requires the `rish` and `rish_shizuku.dex` files to be placed in the `$HOME/.local/bin/` directory.
 
-1.  Open the Shizuku app, go to the "Use Shizuku in terminal apps" section, and follow the instructions to export files.
-2.  Return to Termux and run the following commands to create the necessary directory and copy `rish` to the expected location:
+1.  **Export Files from Shizuku:**
+    In the Shizuku app, navigate to the "Use Shizuku in terminal apps" section and select "Export files". This will place the `rish` and `rish_shizuku.dex` files into your Termux home directory (`$HOME`).
 
+2.  **Move Files to the Local Bin Directory:**
+    Once the files are in your home directory, run the following commands in Termux to move them to the location this script expects.
     ```bash
-    # First, ensure 'rish' is accessible in Termux.
-    # If 'which rish' finds nothing, complete the setup in the Shizuku app first.
-    if ! command -v rish &> /dev/null; then
-        echo "Error: 'rish' command not found in Termux."
-        echo "Please follow the guide in the Shizuku app first, then re-run this."
-        return
-    fi
-
-    # Create the local bin directory and copy rish into it.
+    # Create the target directory if it doesn't exist
     mkdir -p "$HOME/.local/bin"
-    cp "$(which rish)" "$HOME/.local/bin/rish"
+
+    # Move the files from your home directory
+    mv "$HOME/rish" "$HOME/.local/bin/rish"
+    mv "$HOME/rish_shizuku.dex" "$HOME/.local/bin/rish_shizuku.dex"
+
+    echo "Successfully moved rish and rish_shizuku.dex."
     ```
+
+3.  **Set the Application ID:**
+    You must edit the `rish` script to tell Shizuku which application is using it.
+
+    Open the script in a text editor like `nano`:
+    ```bash
+    nano ~/.local/bin/rish
+    ```
+    Find the line that sets `RISH_APPLICATION_ID` (it might be commented out or set to a different value) and change it to:
+    ```sh
+    export RISH_APPLICATION_ID="com.termux"
+    ```
+    Save the file and exit (in `nano`, press `Ctrl+X`, then `Y`, then `Enter`). This step is crucial for `rish` to work correctly from within Termux.
+
+4.  **(Recommended) Add Local Bin to PATH:**
+    To easily run `rish` and other local scripts from any directory, it's good practice to add `$HOME/.local/bin` to your shell's `PATH`.
+
+    For `bash` (the default Termux shell), you can do this by adding the following line to your `~/.bashrc` file:
+    ```bash
+    # Add the local bin directory to the PATH
+    echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
+
+    # Apply the changes to your current session
+    source ~/.bashrc
+    ```
+    For other shells like `zsh`, you would add the export line to `~/.zshrc` instead.
 
 ### 3. Install the Script
 
