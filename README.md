@@ -21,10 +21,10 @@ Ensure you have the following applications installed and properly configured:
 
 *   **[Brevent](https://play.google.com/store/apps/details?id=me.piebridge.brevent)**
 *   **[Shizuku](https://github.com/RikkaApps/Shizuku)**
-*   **[Termux](https://github.com/termux/termux-app)** (Recommended from F-Droid)
-*   **[Termux:Boot](https://github.com/termux/termux-boot)** (Available on F-Droid)
+*   **[Termux](https://github.com/termux/termux-app)** ([F-Droid](https://f-droid.org/packages/com.termux/))
+*   **[Termux:Boot](https://github.com/termux/termux-boot)** ([F-Droid](https://f-droid.org/packages/com.termux.boot/))
 
-**Note**: Make sure these apps are working correctly before proceeding (e.g., Shizuku is running and Brevent has been activated).
+**Note**: Make sure these apps are installed and configured correctly before proceeding.
 
 ### 2. Configure Shizuku (rish)
 
@@ -70,6 +70,8 @@ chmod +x "$HOME/.termux/boot/auto-brevent-starter.sh"
 After completing all the steps above, reboot your device.
 
 `Termux:Boot` will launch the script automatically, which will then start the Brevent service.
+
+**Manual Execution**: You can also manually execute the script from Termux at any time by running `~/.termux/boot/auto-brevent-starter.sh`. This is useful for testing or if you need to restart Brevent without rebooting.
 
 ## Logging & Troubleshooting
 
