@@ -1,114 +1,141 @@
-# auto-brevent-starter.sh
+# auto-brevent-starter.sh 🚀
 
-A script that leverages Termux:Boot to automatically start the Brevent server via Shizuku on device startup.
+A robust script that leverages Termux:Boot to automatically start the Brevent server via Shizuku on device startup.
 
-## How It Works
+## ✨ Features
 
-This script is designed for `Termux:Boot` to ensure the Brevent service is running after a reboot. Here is the workflow:
+*   **Reliable Startup**: Intelligently waits for Shizuku to be ready before attempting to launch Brevent.
+*   **Safe Timeouts**: Prevents the script from waiting indefinitely. It will exit gracefully if Shizuku or Brevent fail to start in a timely manner.
+*   **Detailed Logging**: Every action is logged to a file, making troubleshooting simple.
+*   **Customizable**: Easily change timeout durations or the path to your `rish` executable.
+*   **Instance Locking**: Prevents multiple instances of the script from running simultaneously.
 
-1.  After the device boots, the `Termux:Boot` app automatically executes this script.
-2.  The script waits until the Shizuku service is fully initialized and available.
-3.  Once Shizuku is ready, the script uses Shizuku's command-line interface, `rish`, to execute Brevent's server startup script (`brevent.sh`) with `adb`-equivalent privileges.
-4.  The entire process is logged, making it easy to trace and troubleshoot any issues.
+## 🤔 How It Works
 
-## How to Use
+The script follows a simple, automated workflow when your device boots up:
 
-Follow these steps to set up and install the script.
+1.  **Boot Trigger**: `Termux:Boot` automatically executes the script.
+2.  **Wait for Shizuku**: The script polls for the Shizuku service, waiting until it's fully initialized and ready to accept commands.
+3.  **Launch Brevent**: Once Shizuku is active, the script uses `rish` (Shizuku's command-line interface) to start the Brevent server.
+4.  **Confirm & Exit**: The script monitors for a success message from Brevent and then exits.
 
-### 1. Prerequisites
+---
 
-Ensure you have the following applications installed and properly configured:
+## 🛠️ Installation and Setup Guide
+
+Follow these steps carefully to get the script running.
+
+### Step 1: Prerequisites 📲
+
+First, ensure you have the following applications installed and properly configured on your device:
 
 *   **[Brevent](https://play.google.com/store/apps/details?id=me.piebridge.brevent)**
 *   **[Shizuku](https://github.com/RikkaApps/Shizuku)**
 *   **[Termux](https://github.com/termux/termux-app)** ([F-Droid](https://f-droid.org/packages/com.termux/))
 *   **[Termux:Boot](https://github.com/termux/termux-boot)** ([F-Droid](https://f-droid.org/packages/com.termux.boot/))
 
-**Note**: Make sure these apps are installed and configured correctly before proceeding.
+> **Warning**: Make sure these apps are installed and working correctly before proceeding.
 
-### 2. Configure Shizuku (rish)
+### Step 2: Configure Shizuku (`rish`) ⚙️
 
-This script requires the `rish` and `rish_shizuku.dex` files to be placed in the `$HOME/.local/bin/` directory.
+This script needs to use `rish`, the tool that lets Termux talk to Shizuku.
 
-1.  **Export Files from Shizuku:**
-    In the Shizuku app, navigate to the "Use Shizuku in terminal apps" section and select "Export files". This will place the `rish` and `rish_shizuku.dex` files into your Termux home directory (`$HOME`).
+1.  **Export `rish` Files**:
+    *   In the Shizuku app, go to the **Use Shizuku in terminal apps** section.
+    *   Tap **Export files** to copy `rish` and `rish_shizuku.dex` to your Termux home directory.
 
-2.  **Move Files to the Local Bin Directory:**
-    Once the files are in your home directory, run the following commands in Termux to move them to the location this script expects.
+2.  **Move and Configure `rish`**:
+    Run the following commands in Termux to move the files to a standard location and configure them for use with Termux.
+
     ```bash
     # Create the target directory if it doesn't exist
     mkdir -p "$HOME/.local/bin"
 
-    # Move the files from your home directory
+    # Move the files
     mv "$HOME/rish" "$HOME/.local/bin/rish"
     mv "$HOME/rish_shizuku.dex" "$HOME/.local/bin/rish_shizuku.dex"
 
-    echo "Successfully moved rish and rish_shizuku.dex."
+    # IMPORTANT: Set the Application ID for Termux
+    # This command replaces the 'PKG' placeholder inside the rish script with Termux's package name.
+    sed -i 's/PKG/com.termux/' "$HOME/.local/bin/rish"
+
+    echo "✅ rish setup complete."
     ```
 
-3.  **Set the Application ID:**
-    You must edit the `rish` script to tell Shizuku which application is using it.
+3.  **(Recommended) Add to PATH**:
+    To make it easier to run `rish` manually, add it to your shell's `PATH`.
 
-    Open the script in a text editor like `nano`:
     ```bash
-    nano ~/.local/bin/rish
-    ```
-    Find the line that sets `RISH_APPLICATION_ID` (it might be commented out or set to a different value) and change it to:
-    ```sh
-    export RISH_APPLICATION_ID="com.termux"
-    ```
-    Save the file and exit (in `nano`, press `Ctrl+X`, then `Y`, then `Enter`). This step is crucial for `rish` to work correctly from within Termux.
-
-4.  **(Recommended) Add Local Bin to PATH:**
-    To easily run `rish` and other local scripts from any directory, it's good practice to add `$HOME/.local/bin` to your shell's `PATH`.
-
-    For `bash` (the default Termux shell), you can do this by adding the following line to your `~/.bashrc` file:
-    ```bash
-    # Add the local bin directory to the PATH
+    # Add the local bin directory to your .bashrc file
     echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bashrc
 
     # Apply the changes to your current session
     source ~/.bashrc
     ```
-    For other shells like `zsh`, you would add the export line to `~/.zshrc` instead.
+    *(If you use a different shell, please add the local bin directory to your PATH according to your shell's configuration method.)*
+### Step 3: Install the Script 📂
 
-### 3. Install the Script
-
-The script must be placed in Termux's `boot` directory to run automatically on startup.
-
-Run the following commands to create the directory and download the script:
+Place the script in the `Termux:Boot` startup directory.
 
 ```bash
 # Create the Termux boot directory if it doesn't exist
 mkdir -p "$HOME/.termux/boot/"
 
-# Download the script file from GitHub into that directory
-# (We use curl for a single file, as 'git clone' would download the whole repository)
+# Download the script from GitHub into that directory
 curl -L "https://raw.githubusercontent.com/myuverr/auto-brevent-starter.sh/main/auto-brevent-starter.sh" -o "$HOME/.termux/boot/auto-brevent-starter.sh"
 
 # Grant the script execute permissions
 chmod +x "$HOME/.termux/boot/auto-brevent-starter.sh"
+
+echo "✅ Script installed successfully!"
 ```
 
-### 4. Reboot
+### Step 4: Reboot! 🔄
 
-After completing all the steps above, reboot your device.
+That's it! Reboot your device. `Termux:Boot` will run the script, which will wait for Shizuku and then start Brevent.
 
-`Termux:Boot` will launch the script automatically, which will then start the Brevent service.
+> **Manual Activation**: You can manually run the script at any time to start the Brevent service without rebooting. This is useful if the service stops for any reason.
+> `~/.termux/boot/auto-brevent-starter.sh`
 
-**Manual Execution**: You can also manually execute the script from Termux at any time by running `~/.termux/boot/auto-brevent-starter.sh`. This is useful for testing or if you need to restart Brevent without rebooting.
+---
 
-## Logging & Troubleshooting
+## 🔧 Customization
 
-Every step of the script's execution is logged. If you encounter any problems, you can check the log file for details.
+You can easily tweak the script's behavior by editing the constants at the top of the file.
+Open the script with a text editor (e.g., `nvim` or any other text editor you prefer): `nvim ~/.termux/boot/auto-brevent-starter.sh`
 
-Log file location: `~/.local/state/auto_brevent/script.log`
+Here are the most common variables to change:
 
-Use this command to view the log:
-```bash
-cat ~/.local/state/auto_brevent/script.log
-```
+*   **`RISH_PATH`**: Change this if your `rish` executable is not in the default location.
+    ```sh
+    # Default:
+    readonly RISH_PATH="$HOME/.local/bin/rish"
+    ```
+*   **`SHIZUKU_WAIT_TIMEOUT_MINUTES`**: How long the script waits for Shizuku (in minutes).
+    ```sh
+    # Default: 5 minutes
+    readonly SHIZUKU_WAIT_TIMEOUT_MINUTES=5
+    ```
+*   **`BREVENT_LAUNCH_TIMEOUT_SECONDS`**: How long the script waits for Brevent to confirm its launch (in seconds).
+    ```sh
+    # Default: 60 seconds
+    readonly BREVENT_LAUNCH_TIMEOUT_SECONDS=60
+    ```
 
-## License
+## 🔍 Logging & Troubleshooting
+
+If something goes wrong, the log file is the first place to look.
+
+*   **Log File Location**: `~/.local/state/auto_brevent/script.log`
+*   **View the Log**:
+    ```bash
+    cat ~/.local/state/auto_brevent/script.log
+    ```
+*   **View the Log in Real-time**:
+    ```bash
+    tail -f ~/.local/state/auto_brevent/script.log
+    ```
+
+## 📜 License
 
 This project is licensed under the [WTFPL](LICENSE).
