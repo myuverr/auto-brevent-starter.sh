@@ -1,8 +1,8 @@
-# auto-brevent-starter.sh 🚀
+# auto-brevent-starter.sh
 
 A robust script that leverages Termux:Boot to automatically start the Brevent server via Shizuku on device startup.
 
-## ✨ Features
+## Features
 
 *   **Reliable Startup**: Intelligently waits for Shizuku to be ready before attempting to launch Brevent.
 *   **Safe Timeouts**: Prevents the script from waiting indefinitely. It will exit gracefully if Shizuku or Brevent fail to start in a timely manner.
@@ -10,7 +10,7 @@ A robust script that leverages Termux:Boot to automatically start the Brevent se
 *   **Customizable**: Easily change timeout durations or the path to your `rish` executable.
 *   **Instance Locking**: Prevents multiple instances of the script from running simultaneously.
 
-## 🤔 How It Works
+## How It Works
 
 The script follows a simple, automated workflow when your device boots up:
 
@@ -21,28 +21,32 @@ The script follows a simple, automated workflow when your device boots up:
 
 ---
 
-## 🛠️ Installation and Setup Guide
+## Installation and Setup Guide
 
 Follow these steps carefully to get the script running.
 
-### Step 1: Prerequisites 📲
+### Step 1: Prerequisites
 
 First, ensure you have the following applications installed and properly configured on your device:
 
 *   **[Brevent](https://play.google.com/store/apps/details?id=me.piebridge.brevent)**
-*   **[Shizuku](https://github.com/RikkaApps/Shizuku)**
+*   **[Shizuku](https://github.com/RikkaApps/Shizuku)** (Official) or **[Shizuku (thedjchi fork)](https://github.com/thedjchi/Shizuku)** (**Recommended**)
+    *   *Why the fork?* It includes a more robust "start on boot" feature that waits for a Wi-Fi connection before starting. Combined with this script, it provides a more seamless automated experience.
 *   **[Termux](https://github.com/termux/termux-app)** ([F-Droid](https://f-droid.org/packages/com.termux/))
 *   **[Termux:Boot](https://github.com/termux/termux-boot)** ([F-Droid](https://f-droid.org/packages/com.termux.boot/))
 
 > **Warning**: Make sure these apps are installed and working correctly before proceeding.
 
-### Step 2: Configure Shizuku (`rish`) ⚙️
+### Step 2: Configure Shizuku (`rish`)
 
 This script needs to use `rish`, the tool that lets Termux talk to Shizuku.
 
 1.  **Export `rish` Files**:
     *   In the Shizuku app, go to the **Use Shizuku in terminal apps** section.
-    *   Tap **Export files** to copy `rish` and `rish_shizuku.dex` to your Termux home directory.
+    *   Tap **Export files**. When the system file picker appears:
+        *   Open the sidebar (usually a hamburger menu on the top left).
+        *   Select **Termux** from the list.
+        *   Confirm the selection (e.g., tap "Use this folder"). This will copy `rish` and `rish_shizuku.dex` to your Termux home directory (`$HOME`).
 
 2.  **Move and Configure `rish`**:
     Run the following commands in Termux to move the files to a standard location and configure them for use with Termux.
@@ -59,7 +63,7 @@ This script needs to use `rish`, the tool that lets Termux talk to Shizuku.
     # This command replaces the 'PKG' placeholder inside the rish script with Termux's package name.
     sed -i 's/PKG/com.termux/' "$HOME/.local/bin/rish"
 
-    echo "✅ rish setup complete."
+    echo "rish setup complete."
     ```
 
 3.  **(Recommended) Add to PATH**:
@@ -73,7 +77,7 @@ This script needs to use `rish`, the tool that lets Termux talk to Shizuku.
     source ~/.bashrc
     ```
     *(If you use a different shell, please add the local bin directory to your PATH according to your shell's configuration method.)*
-### Step 3: Install the Script 📂
+### Step 3: Install the Script
 
 Place the script in the `Termux:Boot` startup directory.
 
@@ -87,10 +91,10 @@ curl -L "https://raw.githubusercontent.com/myuverr/auto-brevent-starter.sh/main/
 # Grant the script execute permissions
 chmod +x "$HOME/.termux/boot/auto-brevent-starter.sh"
 
-echo "✅ Script installed successfully!"
+echo "Script installed successfully!"
 ```
 
-### Step 4: Reboot! 🔄
+### Step 4: Reboot!
 
 That's it! Reboot your device. `Termux:Boot` will run the script, which will wait for Shizuku and then start Brevent.
 
@@ -99,7 +103,7 @@ That's it! Reboot your device. `Termux:Boot` will run the script, which will wai
 
 ---
 
-## 🔧 Customization
+## Customization
 
 You can easily tweak the script's behavior by editing the constants at the top of the file.
 Open the script with a text editor (e.g., `nvim` or any other text editor you prefer): `nvim ~/.termux/boot/auto-brevent-starter.sh`
@@ -122,7 +126,7 @@ Here are the most common variables to change:
     readonly BREVENT_LAUNCH_TIMEOUT_SECONDS=60
     ```
 
-## 🔍 Logging & Troubleshooting
+## Logging & Troubleshooting
 
 If something goes wrong, the log file is the first place to look.
 
@@ -136,6 +140,6 @@ If something goes wrong, the log file is the first place to look.
     tail -f ~/.local/state/auto_brevent/script.log
     ```
 
-## 📜 License
+## License
 
 This project is licensed under the [WTFPL](LICENSE).
