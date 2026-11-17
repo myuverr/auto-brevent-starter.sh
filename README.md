@@ -1,22 +1,37 @@
-# auto-brevent-starter.sh
+# Auto Brevent Starter
 
-Start the Brevent server automatically at boot using Termux:Boot and Shizuku.
+Automatically start the Brevent server with either the [Shevery module](#shevery-module) or the [Termux:Boot script](#termuxboot-script).
 
-## Requirements
+## Shevery module
+
+Requires [Shevery](https://github.com/HmnDev-Tech/shevery) and [Brevent](https://play.google.com/store/apps/details?id=me.piebridge.brevent).
+
+Download `shevery-module-*.zip` from the [latest release](https://github.com/myuverr/auto-brevent-starter.sh/releases/latest), install it through Shevery's module manager, and enable the module.
+
+In Shevery, open **Settings → Modules**:
+
+1. Set **Module access mode** to **Full access**, or select **Custom** and enable **Run Service** under **Custom permissions**.
+2. Enable **Allow background actions**.
+
+Brevent will start automatically whenever Shevery becomes active.
+
+## Termux:Boot script
+
+### Requirements
 
 - [Brevent](https://play.google.com/store/apps/details?id=me.piebridge.brevent), with its setup completed.
-- [Shizuku](https://github.com/RikkaApps/Shizuku) or the [thedjchi fork](https://github.com/thedjchi/Shizuku), which supports waiting for Wi-Fi before starting on boot.
-- [Termux](https://f-droid.org/packages/com.termux/) and [Termux:Boot](https://f-droid.org/packages/com.termux.boot/), installed from the same source.
+- [Shizuku](https://github.com/RikkaApps/Shizuku) or the [thedjchi fork](https://github.com/thedjchi/Shizuku) (supports automatic startup at boot after Wi-Fi becomes available).
+- [Termux](https://github.com/termux/termux-app) ([F-Droid](https://f-droid.org/packages/com.termux/)) and [Termux:Boot](https://github.com/termux/termux-boot) ([F-Droid](https://f-droid.org/packages/com.termux.boot/)). Both must be installed from the same distribution source.
 
 Open Termux:Boot once after installation to enable it to run at boot.
 
-**Shizuku must start separately.** This script waits for Shizuku; it does not start it. Configure Shizuku's boot startup if you want the entire process to be automatic.
+Start Shizuku separately first. For a fully automatic setup, configure Shizuku to start on boot.
 
-## Setup
+### Setup
 
 Run the following commands in Termux.
 
-### 1. Configure rish
+#### 1. Configure rish
 
 In Shizuku, open **Use Shizuku in terminal apps** and export `rish` and `rish_shizuku.dex` to your Termux home directory (`$HOME`). Select **Termux** in the file picker's sidebar to access that directory.
 
@@ -46,16 +61,16 @@ source "$HOME/.bashrc"
 
 For other shells, add the same PATH entry to the appropriate startup file.
 
-### 2. Install the startup script
+#### 2. Install the startup script
 
 ```sh
 mkdir -p "$HOME/.termux/boot"
-curl -fL "https://raw.githubusercontent.com/myuverr/auto-brevent-starter.sh/main/auto-brevent-starter.sh" \
+curl -fL "https://github.com/myuverr/auto-brevent-starter.sh/releases/latest/download/auto-brevent-starter.sh" \
     -o "$HOME/.termux/boot/auto-brevent-starter.sh"
 chmod +x "$HOME/.termux/boot/auto-brevent-starter.sh"
 ```
 
-### 3. Run it
+#### 3. Run it
 
 Run the script once and confirm that Brevent shows its server as running:
 
@@ -65,7 +80,7 @@ Run the script once and confirm that Brevent shows its server as running:
 
 After rebooting, Termux:Boot will run it automatically. You can also use the same command whenever Brevent needs to be started again.
 
-## Settings
+### Settings
 
 The defaults should suit most installations. To change them, edit the constants near the top of `~/.termux/boot/auto-brevent-starter.sh`.
 
@@ -76,7 +91,7 @@ The defaults should suit most installations. To change them, edit the constants 
 | `SHIZUKU_WAIT_TIMEOUT_MINUTES` | `5` | Maximum wait for Shizuku, in minutes |
 | `BREVENT_LAUNCH_TIMEOUT_SECONDS` | `60` | Maximum wait for Brevent to report startup, in seconds |
 
-## Logging & Troubleshooting
+### Logging & Troubleshooting
 
 If something goes wrong, check the log:
 
@@ -92,4 +107,4 @@ tail -F ~/.local/state/auto_brevent/script.log
 
 ## License
 
-This project is licensed under the [WTFPL](LICENSE).
+This project is dual-licensed under the [ISC](LICENSE-ISC) or [WTFPL](LICENSE-WTFPL), at your option.
